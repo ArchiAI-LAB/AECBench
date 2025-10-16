@@ -1,63 +1,21 @@
----
-license: cc-by-nc-4.0
-task_categories:
-  - text-classification
-  - question-answering
-  - token-classification
-  - multiple-choice
-  - text-generation
 
-dataset_info:
-  features:
-    - name: instruction
-      dtype: string
-    - name: question
-      dtype: string
-    - name: answer
-      dtype: string
-
-# Gated form configuration
-extra_gated_fields:
-  full_name: 
-    type: "text"
-    label: "Full Name"
-  affiliation: 
-    type: "text"
-    label: "Affiliation / Organization"
-  email: 
-    type: "text"
-    label: "Institutional Email (preferred)"
-  country: 
-    type: "country"
-    label: "Country / Region"
-  intended_use:
-    type: "select"
-    label: "Intended Use Case"
-    options: ["Academic research", "Educational purpose", "Internal enterprise testing (non-commercial)", "Other"]
-  non_commercial_use:
-    type: "checkbox"
-    label: "I confirm that this dataset will be used for non-commercial purposes only"
-  data_protection_ack:
-    type: "checkbox"
-    label: "I confirm that I will not attempt to extract personal, sensitive, or confidential information from this dataset"
-
-extra_gated_prompt: |
-  To request access to the **AECBench** dataset, please complete the following form. 
-  Access is restricted to non-commercial use. 
-  All requests will be reviewed, and approval may take up to 3 business days.
----
 
 # 🏗️ AECBench 
 
-[🇺🇸 English](README.md) | [🇨🇳 中文说明](README_zh-CN.md)
 
-<center>  
-    <img src="./assets/logo.png" alt="AECBench Logo" width="200">  
-</center>  
 
-<center>  
-    <a href="https://arxiv.org/pdf/2509.18776" target="_blank">📄 Paper (PDF)</a>  
-</center>  
+<p align="center">
+  <img src="./assets/logo.png" alt="AECBench Logo" width="200">
+</p>
+
+
+<div align="center">
+
+[![Homepage](https://img.shields.io/badge/Homepage-GitHub-blue)](https://archiai-lab.github.io/AECBench.github.io/)  [![arXiv](https://img.shields.io/badge/arXiv-2509.18776-b31b1b.svg)](https://arxiv.org/pdf/2509.18776)   [![Dataset](https://img.shields.io/badge/Dataset-HuggingFace-yellow)]([huggingface-link](https://huggingface.co/datasets/jackluoluo/AECBench))  [![Translate](https://img.shields.io/badge/Language-Read_in_Chinese-green?)](README.md)
+ 
+</div>
+
+
 
 
 ---
@@ -67,6 +25,9 @@ extra_gated_prompt: |
 **AECBench** is an open-source large language model Architecture, Engineering & Construction (AEC) domain evaluation benchmark jointly released by East China Architectural Design & Research Institute Co., Ltd. (ECADI) of China Construction Group and Tongji University. This dataset aims to systematically evaluate large language models' (LLMs) knowledge mastery, understanding, reasoning, computation, and application capabilities in the fields of architecture, engineering, and construction. It is currently the first Chinese evaluation benchmark that covers the full AEC lifecycle with the most comprehensive cognitive hierarchy.
 
 AECBench is based on real engineering business scenarios, designed by interdisciplinary engineer teams and validated through double-round expert review, ensuring data **authenticity, professionalism, and high quality**. Additionally, AECBench introduces an "LLM-as-a-Judge" automated evaluation mechanism to achieve scalable assessment of open-ended long-text tasks.
+
+For more information about the project, please refer to our <a href="https://archiai-lab.github.io/AECBench.github.io/" style="text-decoration: underline;">Project Page</a>. 
+
 
 ## Core Advantages
 
@@ -287,7 +248,7 @@ AECBench contains **5 cognitive levels** and **23 evaluation tasks**, totaling a
 
 ## User Guide
 
-1. **Dataset Download**: Please visit the [AECBench Official Repository](https://github.com/xxx/AECBench) to download the complete dataset.  
+1. **Dataset Download**: Please visit the [AECBench Official Repository](https://github.com/ArchiAI-LAB/AECBench) to download the complete dataset.  
 
 2. **Model Evaluation**: AECBench supports automated evaluation processes based on [OpenCompass](https://github.com/open-compass/opencompass):  
    - Place the `data` folder in `{PATH_TO_OPENCOMPASS}/AECBench/`;  
@@ -305,7 +266,7 @@ AECBench contains **5 cognitive levels** and **23 evaluation tasks**, totaling a
 We tested multiple open-source and commercial models (DeepSeek-R1, GPT-4o, Qwen, GLM-4, etc.). 
 
 <div align = center>
-    <img src = './assets/evaluation_res_AECBench.png'>
+    <img src = './assets/evaluation_res_AECBench.png' width="75%">
 </div>
 
 ## License
