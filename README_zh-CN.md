@@ -1,64 +1,17 @@
----
-license: cc-by-nc-4.0
-task_categories:
-  - text-classification
-  - question-answering
-  - token-classification
-  - multiple-choice
-  - text-generation
 
-dataset_info:
-  features:
-    - name: instruction
-      dtype: string
-    - name: question
-      dtype: string
-    - name: answer
-      dtype: string
-
-# Gated form configuration
-extra_gated_fields:
-  full_name: 
-    type: "text"
-    label: "姓名"
-  affiliation: 
-    type: "text"
-    label: "所属机构 / 组织"
-  email: 
-    type: "text"
-    label: "机构邮箱（优先）"
-  country: 
-    type: "country"
-    label: "国家 / 地区"
-  intended_use:
-    type: "select"
-    label: "预期用途"
-    options: ["学术研究", "教育用途", "企业内部测试（非商业）", "其他"]
-  non_commercial_use:
-    type: "checkbox"
-    label: "我确认该数据集仅用于非商业用途"
-  data_protection_ack:
-    type: "checkbox"
-    label: "我确认不会尝试从该数据集中提取任何个人、敏感或机密信息"
-
-extra_gated_prompt: |
-  要申请访问 **AECBench** 数据集，请填写以下表格。
-  数据集仅限非商业用途。
-  所有申请将在 3 个工作日内审核。
----
 
 # 🏗️ AECBench 
 
-[🇺🇸 English](README.md) | [🇨🇳 中文说明](README_zh-CN.md)
 
-<center>  
-    <img src="./assets/logo.png" alt="AECBench Logo" width="200">  
-</center>  
 
-<center>  
-    <a href="https://arxiv.org/pdf/2509.18776" target="_blank">📄 论文（PDF）</a>  
-</center>  
+<p align="center">
+  <img src="./assets/logo.png" alt="AECBench Logo" width="200">
+</p>
 
+<div align="center">
+
+[![Homepage](https://img.shields.io/badge/项目主页-GitHub-blue)](https://archiai-lab.github.io/AECBench.github.io/)  [![arXiv](https://img.shields.io/badge/arXiv-2509.18776-b31b1b.svg)](https://arxiv.org/pdf/2509.18776)   [![Dataset](https://img.shields.io/badge/数据集-HuggingFace-yellow)]([huggingface-link](https://huggingface.co/datasets/jackluoluo/AECBench))  [![Translate](https://img.shields.io/badge/语言-切换英文-green?)](README.md)
+</div>
 
 ---
 
@@ -67,6 +20,9 @@ extra_gated_prompt: |
 **AECBench** 是由华建集团华东建筑设计研究院有限公司（ECADI）和同济大学联合发布的一款开源大型语言模型建筑、工程与施工（AEC）领域测评基准。该数据集旨在系统评估大语言模型（LLMs）在建筑、工程、施工领域的知识掌握、理解、推理、计算与应用能力，是目前首个覆盖AEC全生命周期、认知层次最全面的中文测评基准。
 
 AECBench基于真实工程业务场景，由跨学科工程师团队设计并经双轮专家审核，确保数据的**真实性、专业性与高质量**。同时，AECBench引入“LLM-as-a-Judge”自动评测机制，实现开放式长文本任务的可扩展评估。
+
+更多信息请访问我们的<a href="https://archiai-lab.github.io/AECBench.github.io/" style="text-decoration: underline;">项目主页</a>。
+
 
 ## 核心优势
 
@@ -285,7 +241,7 @@ AECBench包含 **5个认知层级**、**23个评测任务**，共计约4800条�
 ```
 
 ## 使用指南
-1.**数据集下载**：请点击[AECBench](https://github.com/xxx/AECBench)下载数据集。
+1.**数据集下载**：请点击[AECBench](https://github.com/ArchiAI-LAB/AECBench)下载数据集。
 
 2.**模型评估**：我们提供基于[OpenCompass](https://github.com/jack-luoluo/AECBench)的模型评估方案，实施步骤如下所示：
  - 首先，完成opencompass的安装过程后，将AECBench->data文件夹数据内容解压放入{PATH_TO_OPENCOMPASS}/AAECBench/处；
