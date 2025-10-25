@@ -11,7 +11,7 @@
 
 <div align="center">
 
-[![Homepage](https://img.shields.io/badge/Homepage-GitHub-blue)](https://archiai-lab.github.io/AECBench.github.io/)  [![arXiv](https://img.shields.io/badge/arXiv-2509.18776-b31b1b.svg)](https://arxiv.org/pdf/2509.18776)   [![Dataset](https://img.shields.io/badge/Dataset-HuggingFace-yellow)]([huggingface-link](https://huggingface.co/datasets/jackluoluo/AECBench))  [![Translate](https://img.shields.io/badge/Language-Read_in_Chinese-green?)](README.md)
+[![Homepage](https://img.shields.io/badge/Homepage-GitHub-blue)](https://archiai-lab.github.io/AECBench.github.io/)  [![arXiv](https://img.shields.io/badge/arXiv-2509.18776-b31b1b.svg)](https://arxiv.org/pdf/2509.18776)   [![Dataset](https://img.shields.io/badge/Dataset-HuggingFace-yellow)](https://huggingface.co/datasets/jackluoluo/AECBench)  [![Translate](https://img.shields.io/badge/Language-Read_in_Chinese-green?)](README.md)
  
 </div>
 

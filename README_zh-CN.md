@@ -10,7 +10,7 @@
 
 <div align="center">
 
-[![Homepage](https://img.shields.io/badge/项目主页-GitHub-blue)](https://archiai-lab.github.io/AECBench.github.io/)  [![arXiv](https://img.shields.io/badge/arXiv-2509.18776-b31b1b.svg)](https://arxiv.org/pdf/2509.18776)   [![Dataset](https://img.shields.io/badge/数据集-HuggingFace-yellow)]([huggingface-link](https://huggingface.co/datasets/jackluoluo/AECBench))  [![Translate](https://img.shields.io/badge/语言-切换英文-green?)](README.md)
+[![Homepage](https://img.shields.io/badge/项目主页-GitHub-blue)](https://archiai-lab.github.io/AECBench.github.io/)  [![arXiv](https://img.shields.io/badge/arXiv-2509.18776-b31b1b.svg)](https://arxiv.org/pdf/2509.18776)   [![Dataset](https://img.shields.io/badge/数据集-HuggingFace-yellow)](https://huggingface.co/datasets/jackluoluo/AECBench)  [![Translate](https://img.shields.io/badge/语言-切换英文-green?)](README.md)
 </div>
 
 ---
