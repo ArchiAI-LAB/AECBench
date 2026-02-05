@@ -213,21 +213,21 @@ AECBench contains **5 cognitive levels** and **23 evaluation tasks**, totaling a
     <td class="tg-0pky">5-3-1</td>
     <td class="tg-qdov">Conceptual Design Proposal Generation</td>
     <td class="tg-qdov">Given a project brief and specs, generate a preliminary design proposal.</td>
-    <td class="tg-0pky">Expert Score</td>
+    <td class="tg-0pky">Rubric-guided LLM-as-a-Judge</td>
     <td class="tg-0pky">Generation</td>
   </tr>
   <tr>
     <td class="tg-0pky">5-3-2</td>
     <td class="tg-qdov">Specialized Report Generation</td>
     <td class="tg-qdov">Given the project brief, generate a code-compliant structural design basis report.</td>
-    <td class="tg-0pky">Expert Score</td>
+    <td class="tg-0pky">Rubric-guided LLM-as-a-Judge</td>
     <td class="tg-0pky">Generation</td>
   </tr>
   <tr>
     <td class="tg-0lax">5-3-3</td>
     <td class="tg-0lax">Tender Review Report Generation</td>
     <td class="tg-qdov">Identify parameter mismatches and generate a tender review report summarizing discrepancies.</td>
-    <td class="tg-0lax">Expert Score</td>
+    <td class="tg-0lax">Rubric-guided LLM-as-a-Judge</td>
     <td class="tg-0lax">Generation</td>
   </tr>
 </tbody>
