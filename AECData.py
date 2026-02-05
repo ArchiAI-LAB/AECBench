@@ -2,6 +2,8 @@ import json
 import os.path as osp
 import re
 import os
+import csv
+import math
 import openai
 
 from collections import Counter
@@ -13,6 +15,22 @@ from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
                                   TEXT_POSTPROCESSORS)
 
 from .base import BaseDataset
+
+__all__ = [
+    'MyDataset',
+    'mydataset_mcq_postprocess',
+    'mydataset_zysb_postprocess',
+    'mydataset_xxpp_postprocess',
+    'mydataset_zbcq_postprocess',
+    'mydataset_score_content_accuracy_postprocess',
+    'MyDatasetlEvaluator_mcq',
+    'MyDatasetlEvaluator_F1',
+    'MyDatasetlEvaluator_F0_5',
+    'MyDatasetlEvaluator_F1Soft_zbcq',
+    'MyDatasetlEvaluator_F1Beta_xxpp',
+    'MyDatasetlEvaluator_gpt4o',
+    'MyDatasetlEvaluator_KendallTau',
+]
 
 
 class CJRCEvaluator:
@@ -84,6 +102,82 @@ def get_QA_chatGPT4(user_msg):
     return content, prompt_tokens, completion_tokens
 
 
+def _coerce_number(value):
+    if isinstance(value, (int, float)):
+        if isinstance(value, float) and math.isnan(value):
+            return None
+        return float(value)
+    if isinstance(value, str):
+        value = value.strip()
+        if not value:
+            return None
+        try:
+            return float(value)
+        except ValueError:
+            return None
+    return None
+
+
+def _extract_score_from_text(text: str, score_key: str = '总得分'):
+    if text is None:
+        return None
+    if isinstance(text, (int, float)):
+        return _coerce_number(text)
+    if not isinstance(text, str):
+        return None
+    text = text.strip()
+    if not text:
+        return None
+    start = text.find('{')
+    end = text.rfind('}')
+    if start != -1 and end != -1 and end > start:
+        try:
+            payload = json.loads(text[start:end + 1])
+            if isinstance(payload, dict):
+                if score_key in payload:
+                    return _coerce_number(payload[score_key])
+                if 'model_rate' in payload:
+                    return _coerce_number(payload['model_rate'])
+        except Exception:
+            pass
+    match = re.search(rf'{re.escape(score_key)}[^0-9]*([0-9]+(?:\.[0-9]+)?)', text)
+    if match:
+        return _coerce_number(match.group(1))
+    match = re.search(r'model_rate[^0-9]*([0-9]+(?:\.[0-9]+)?)', text)
+    if match:
+        return _coerce_number(match.group(1))
+    return None
+
+
+def _extract_content_accuracy(text: str):
+    if text is None:
+        return None
+    if isinstance(text, (int, float)):
+        return _coerce_number(text)
+    if not isinstance(text, str):
+        return None
+    text = text.strip()
+    if not text:
+        return None
+    start = text.find('{')
+    end = text.rfind('}')
+    if start != -1 and end != -1 and end > start:
+        try:
+            payload = json.loads(text[start:end + 1])
+            if isinstance(payload, dict):
+                detail = payload.get('评分明细')
+                if isinstance(detail, dict) and '内容准确性' in detail:
+                    return _coerce_number(detail['内容准确性'])
+                if '内容准确性' in payload:
+                    return _coerce_number(payload['内容准确性'])
+        except Exception:
+            pass
+    match = re.search(r'内容准确性[^0-9]*([0-9]+(?:\.[0-9]+)?)', text)
+    if match:
+        return _coerce_number(match.group(1))
+    return None
+
+
 @LOAD_DATASET.register_module()
 class MyDataset(BaseDataset):
     @staticmethod
@@ -102,6 +196,22 @@ def mydataset_mcq_postprocess(text: str) -> str:
     matches = re.findall(pattern, text)
     out = "".join(matches)
     return out
+
+
+@TEXT_POSTPROCESSORS.register_module('mydataset-score')
+def mydataset_score_postprocess(text: str):
+    score = _extract_score_from_text(text)
+    if score is None:
+        return float('nan')
+    return score
+
+
+@TEXT_POSTPROCESSORS.register_module('mydataset-score-content-accuracy')
+def mydataset_score_content_accuracy_postprocess(text: str):
+    score = _extract_content_accuracy(text)
+    if score is None:
+        return float('nan')
+    return score
 
 
 # 专业识别预测提取
@@ -321,3 +431,120 @@ class MyDatasetlEvaluator_gpt4o(BaseEvaluator):
         score = score / len(references) * 100
 
         return {'score': score}
+
+
+@ICL_EVALUATORS.register_module()
+class MyDatasetlEvaluator_KendallTau(BaseEvaluator):
+
+    def __init__(self,
+                 score_file: str = None,
+                 score_format: str = 'auto',
+                 sheet_name=0,
+                 score_column: int = 1,
+                 row_start: int = 0,
+                 row_end: int = None,
+                 score_key: str = '总得分',
+                 has_header: bool = False):
+        self.score_file = score_file
+        self.score_format = score_format
+        self.sheet_name = sheet_name
+        self.score_column = score_column
+        self.row_start = row_start
+        self.row_end = row_end
+        self.score_key = score_key
+        self.has_header = has_header
+
+    def _load_scores(self):
+        score_file = self.score_file or os.environ.get('AECBENCH_EVAL_SCORE_FILE')
+        if not score_file:
+            raise ValueError('score_file not set; provide score_file in config or set AECBENCH_EVAL_SCORE_FILE.')
+        ext = osp.splitext(score_file)[1].lower()
+        fmt = self.score_format
+        if fmt == 'auto':
+            if ext in ('.csv',):
+                fmt = 'csv'
+            elif ext in ('.xls', '.xlsx'):
+                fmt = 'excel'
+        scores = []
+        if fmt == 'csv':
+            with open(score_file, 'r', encoding='utf-8') as f:
+                reader = csv.reader(f)
+                if self.has_header:
+                    next(reader, None)
+                for row in reader:
+                    if self.score_column >= len(row):
+                        scores.append(float('nan'))
+                        continue
+                    scores.append(_coerce_number(row[self.score_column]))
+        elif fmt == 'excel':
+            try:
+                import pandas as pd
+            except Exception as e:
+                raise ImportError('pandas is required to read Excel score files.') from e
+            df = pd.read_excel(score_file, sheet_name=self.sheet_name)
+            if isinstance(self.score_column, int):
+                col = df.iloc[:, self.score_column]
+            else:
+                col = df[self.score_column]
+            scores = [ _coerce_number(v) for v in col.tolist() ]
+        else:
+            raise ValueError(f'Unsupported score_format: {self.score_format}')
+        if self.row_end is None:
+            scores = scores[self.row_start:]
+        else:
+            scores = scores[self.row_start:self.row_end]
+        return scores
+
+    @staticmethod
+    def _kendall_tau_b(x, y):
+        n = len(x)
+        c = d = tx = ty = 0
+        for i in range(n - 1):
+            xi = x[i]
+            yi = y[i]
+            for j in range(i + 1, n):
+                xj = x[j]
+                yj = y[j]
+                if xi == xj and yi == yj:
+                    continue
+                if xi == xj:
+                    tx += 1
+                    continue
+                if yi == yj:
+                    ty += 1
+                    continue
+                s = (xi - xj) * (yi - yj)
+                if s > 0:
+                    c += 1
+                elif s < 0:
+                    d += 1
+        denom = math.sqrt((c + d + tx) * (c + d + ty))
+        if denom == 0:
+            return 0.0
+        return (c - d) / denom
+
+    def score(self, predictions, references):
+        if not predictions:
+            return {'error': 'predictions is empty'}
+        pred_scores = [_extract_score_from_text(p, self.score_key) for p in predictions]
+        if self.score_file or os.environ.get('AECBENCH_EVAL_SCORE_FILE'):
+            expert_scores = self._load_scores()
+        else:
+            expert_scores = [_coerce_number(r) for r in references]
+        if len(pred_scores) != len(expert_scores):
+            return {
+                'error': 'predictions and expert scores have different length',
+                'predictions_len': len(pred_scores),
+                'expert_scores_len': len(expert_scores)
+            }
+        filtered = [(p, e) for p, e in zip(pred_scores, expert_scores)
+                    if p is not None and e is not None]
+        if len(filtered) < 2:
+            return {'error': 'not enough valid score pairs', 'valid_count': len(filtered)}
+        xs, ys = zip(*filtered)
+        tau = self._kendall_tau_b(xs, ys)
+        return {
+            'score': tau,
+            'kendall_tau': tau,
+            'valid_count': len(filtered)
+        }
