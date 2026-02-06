@@ -82,7 +82,10 @@ def mydataset_bgsc_preprocess(refer):
         return ";\n".join(out)
 
 def get_QA_chatGPT4(user_msg):
-    os.environ['OPENAI_API_KEY'] = 'sk-your openai key'#请输入自己的openai key
+
+    openai.api_key = os.environ.get('OPENAI_API_KEY')
+    if not openai.api_key:
+        raise ValueError('OPENAI_API_KEY环境变量未设置，请设置后再运行')
     system_msg = (
         '你现在是一个专业的结构领域专家，现在希望基于以下标准答案对模型给出的答案进行打分,标准答案为一个字典，标准答案中content为得分点，content内容后面的[score:分值]表示该得分点的分值，总分为1。'
         '现在希望你基于标准答案的得分点分值，*严谨准确*地给模型回答进行打分。以字典格式进行输出，其中key为模型的分数（如model_rate）和模型的打分依据（如model_reason），仅输出json字典格式.')
