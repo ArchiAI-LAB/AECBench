@@ -5,18 +5,29 @@ from opencompass.openicl.icl_evaluator import JiebaRougeEvaluator
 from opencompass.datasets import (MyDataset,mydataset_mcq_postprocess,
                                   MyDatasetlEvaluator_mcq,mydataset_zysb_postprocess,mydataset_xxpp_postprocess,
                                   MyDatasetlEvaluator_F0_5,MyDatasetlEvaluator_F1,mydataset_zbcq_postprocess,MyDatasetlEvaluator_F1Soft_zbcq,MyDatasetlEvaluator_F1Beta_xxpp,
-                                  MyDatasetlEvaluator_gpt4o)
+                                  MyDatasetlEvaluator_gpt4o,MyDatasetlEvaluator_KendallTau,mydataset_score_content_accuracy_postprocess)
 
 #单选选择
-choice_sets = ['1-1知识问答','1-2规范记忆','1-4注册基础考试','2-1数据逻辑理解','2-2建筑设计计算概念','2-4建筑类型判断','2-6简称识别','3-1建筑设计场景理解','3-2建筑设计计算分析','3-6构造措施']#,
-terminology_sets = ['1-3专业术语'] #1-3专业术语
-professional_identification_sets =['2-3专业识别'] #专业识别
-error_correction_sets = ['2-5文本纠错'] #文本纠错
-information_extraction_sets = ['2-7信息抽取'] #招标抽取
-information_matching_sets = ['2-8信息匹配'] #信息匹配
-proposal_recommendation_sets = ['3-3设计方案推荐']  #3-3设计方案推荐
-report_generation_sets = ['3-4报告生成']  #报告生成
-information_check_sets = ['3-5信息核对']  #信息核对
+choice_sets = ['1-1规范记忆', '1-2专业术语', '1-3简称识别',
+               '2-1规范条文解读',
+               '2-2设计通识问答',
+               '2-3规范条文解读（表格数据）',
+               '3-1设计决策制定',
+               '3-2建筑类型判断',
+               '3-3设计决策制定（表格数据）',
+               '4-1建筑设计中的计算',
+               '4-2MEP设计中的计算',
+               '4-3施工中的计算',
+               '4-4工程经济学中的计算', '5-1-3合规审查']#,
+terminology_sets = [] #1-3专业术语
+professional_identification_sets =['5-1-1专业识别'] #专业识别
+error_correction_sets = ['5-1-2文本纠错'] #文本纠错
+information_extraction_sets = ['5-1-5信息抽取'] #招标抽取
+information_matching_sets = ['5-1-4品牌合规验证'] #信息匹配
+proposal_recommendation_sets = ['5-3-1设计方案推荐']  #3-3设计方案推荐
+report_generation_sets = ['5-3-2报告生成']  #报告生成
+information_check_sets = ['5-3-3招投标信息验证']  #信息核对
+evaluation_sets = ['5-2-1建筑设计方案的评估', '5-2-2结构设计方案的评估'] #评估层级
 AECBenchData_datasets = []
 
 
@@ -299,6 +310,37 @@ for _name in information_check_sets:
             path='./AECBench/one-shot',
             name=_name,
             reader_cfg=dict(input_columns=['instruction','question'],
+                    output_column='answer'),
+            infer_cfg=mydataset_infer_cfg.copy(),
+            eval_cfg=mydataset_eval_cfg.copy())
+    )
+
+# 评估层级（LLM-as-a-judge Kendall-Tau）
+for _name in evaluation_sets:
+    mydataset_infer_cfg = dict(
+            prompt_template=dict(
+                type=PromptTemplate,
+                template=dict(round=[
+                    dict(
+                        role="HUMAN",
+                        prompt= f'{{instruction}}{{new_prompts}}'
+                    )
+                ])),
+        retriever=dict(type=ZeroRetriever),
+        inferencer=dict(type=GenInferencer))
+
+    mydataset_eval_cfg =  dict(
+            evaluator=dict(type=MyDatasetlEvaluator_KendallTau),
+            pred_role="BOT",
+            pred_postprocessor=dict(type=mydataset_score_content_accuracy_postprocess))
+
+    AECBenchData_datasets.append(
+        dict(
+            abbr=_name,
+            type=MyDataset,
+            path='./AECBench/one-shot',
+            name=_name,
+            reader_cfg=dict(input_columns=['instruction','new_prompts'],
                     output_column='answer'),
             infer_cfg=mydataset_infer_cfg.copy(),
             eval_cfg=mydataset_eval_cfg.copy())
